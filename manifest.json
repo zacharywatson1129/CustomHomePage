@@ -1,0 +1,6 @@
+{
+    "name": "Weather and Pretty background",
+    "version": "1.0",
+    "description": "Loads background images and the current weather.",
+    "manifest_version": 2
+}
