@@ -1,4 +1,4 @@
-var owmKey = '53368451312c1b1b9a9d66b407d066be';
+var owmKey = 'yourOwnAPIKey';
 
 var weatherItems;
 
