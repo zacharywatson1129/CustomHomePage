@@ -1,37 +1,339 @@
-var owmKey = 'yourOwnAPIKey';
-
-var weatherItems;
-
-var hourlyForecast = "https://pro.openweathermap.org/data/2.5/forecast/hourly?q=Gustine,TX&appid=" + owmKey;
-
+var pixabayAPIKey = "5493635-8300921d011275a8906d2c6d3";
 var bgImg = "";
-var apiCall = 'https://pixabay.com/api/?key=5493635-8300921d011275a8906d2c6d3&q=roses&image_type=photo';
+var apiCall =
+    "https://pixabay.com/api/?key=" + pixabayAPIKey + "&q=roses&image_type=photo";
+
+// The $ is JQuery
 $.getJSON(apiCall, loadBackgroundImage);
 
-var weatherApiCall = 'http://api.openweathermap.org/data/2.5/weather?zip=76455&appid=53368451312c1b1b9a9d66b407d066be';
-$.getJSON(weatherApiCall, weatherFunc);
+var globalData;
+const chosenCity = document.getElementById("chosenCity");
+// This may be stored on the machine somewhere.
+var chosenCityName = 'London';
+chosenCity.innerHTML = chosenCityName;
+var chosenCityTemp = '';
+var chosenCityLat;
+var chosenCityLon;
+
+//console.log('supposedly before')
+//getListOfCitiesByCityName(chosenCityName);
+//console.log('supposedly after')
+showDefaultCityWeather(chosenCityName);
+
+
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+//setWeather();
+
+/*const citiesList = document.getElementById("citiesList");
+function onChange() {
+    var value = citiesList.value;
+    var selectedIndex = citiesList.selectedIndex;
+    var text = "test";
+    console.log(value, text, selectedIndex);
+}*/
+//citiesList.onchange = onChange();
+//onChange();
+
+/*async function searchCity(cityName) {
+    var weatherCall =
+        "https://geocoding-api.open-meteo.com/v1/search?name=" + cityName + "&count=10&language=en&format=json";
+    const response = await fetch(weatherCall);
+    const data = await response.json();
+    console.log('data = \n' + data);
+  }*/
+
+/*function getListOfCitiesByCityName(cityName)
+{
+    var weatherCall =
+        "https://geocoding-api.open-meteo.com/v1/search?name=" + cityName + "&count=10&language=en&format=json";
+
+    fetch(weatherCall)
+        // We use the response variable to check the data.
+        // Essentially, it's a lambda.
+        .then(response => {
+            console.log('response = \n' + response);
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            // We need to return the data to use for the else branch.
+            return response.json();
+        })
+        .then(data => { // call it data now.
+            console.log('data = \n' + data);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}*/
+
+function showDefaultCityWeather(cityName = "London") {
+    var weatherCall =
+        "https://geocoding-api.open-meteo.com/v1/search?name=" + cityName + "&count=10&language=en&format=json";
+
+    fetch(weatherCall)
+        // We use the response variable to check the data.
+        // Essentially, it's a lambda.
+        .then(response => {
+            console.log('response = \n' + response);
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            // We need to return the data to use for the else branch.
+            return response.json();
+        })
+        .then(data => { // call it data now.
+            index = 0;
+            console.log('data = \n' + data);
+            var jsonStr = JSON.stringify(data, null, 2);
+            console.log('jsonStr = \n' + jsonStr);
+            const obj = JSON.parse(jsonStr);
+            chosenCityLon = obj.results[index].longitude;
+            chosenCityLat = obj.results[index].latitude;
+            console.log('just set the global variables chosenCityLon and chosenCityLat', chosenCityLon, chosenCityLat)
+
+            // First, we need to take the chosenCityName and look up coordinates.
+            var weatherString =
+                "https://api.open-meteo.com/v1/forecast?latitude=" +
+                chosenCityLat +
+                "&longitude=" +
+                chosenCityLon +
+                "&current=temperature_2m,precipitation,rain,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=ms&precipitation_unit=inch&forecast_days=1";
+
+            // This handles when you have an exact coordinate
+            fetch(weatherString)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    var jsonStr = JSON.stringify(data, null, 2);
+                    var obj = JSON.parse(jsonStr);
+                    console.log(obj);
+                    const temp = document.getElementById("temp");
+                    temp.innerHTML = obj.current.temperature_2m + ' ' + obj.current_units.temperature_2m;
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    console.log('end of searchCity func');
+}
+
+function setWeather(index = 0, data) {
+    console.log('data = \n' + data);
+    var jsonStr = JSON.stringify(data, null, 2);
+    console.log('jsonStr = \n' + jsonStr);
+    const obj = JSON.parse(jsonStr);
+    chosenCityLon = obj.results[index].longitude;
+    chosenCityLat = obj.results[index].latitude;
+    console.log('just set the global variables chosenCityLon and chosenCityLat', chosenCityLon, chosenCityLat)
+
+    // First, we need to take the chosenCityName and look up coordinates.
+    var weatherString =
+        "https://api.open-meteo.com/v1/forecast?latitude=" +
+        chosenCityLat +
+        "&longitude=" +
+        chosenCityLon +
+        "&current=temperature_2m,precipitation,rain,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=ms&precipitation_unit=inch&forecast_days=1";
+
+    // This handles when you have an exact coordinate
+    fetch(weatherString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            var jsonStr = JSON.stringify(data, null, 2);
+            var obj = JSON.parse(jsonStr);
+            console.log(obj);
+            const temp = document.getElementById("temp");
+            temp.innerHTML = obj.current.temperature_2m + ' ' + obj.current_units.temperature_2m;
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+// This one handles the call using a city name.
+/*fetch(weatherCall)
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
+    })
+    .then((data) => {
+        parseData(data);
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
+var jsonStr = JSON.stringify(data, null, 2);
+const obj = JSON.parse(jsonStr);
+var myCity = 
+    data.results[i].name +
+    ", " +
+    data.results[i].admin1 +
+    ", " +
+    data.results[i].country;
+chosenCity.innerHTML = myCity;
+console.log('made it');
+
+
+var weatherString =
+    "https://api.open-meteo.com/v1/forecast?latitude=" +
+    latitude +
+    "&longitude=" +
+    longitude +
+    "&current=temperature_2m,precipitation,rain,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=ms&precipitation_unit=inch&forecast_days=1";
+
+// This handles when you have an exact coordinate
+fetch(weatherString)
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
+    })
+    .then((data) => {
+        console.log("things were okay, parsingData");
+        showWeather(data);
+        // parseData(data);
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });*/
+
+function parseData(data) {
+    globalData = data;
+
+    // Display data in an HTML element
+    var jsonStr = JSON.stringify(data, null, 2);
+    const obj = JSON.parse(jsonStr);
+
+    console.log(obj);
+    console.log(obj.length);
+    // Clear out the list.
+    citiesList.innerHTML = "";
+    // Fill out the list.
+    for (var i = 0; i < obj.results.length; i++) {
+        var opt = document.createElement("option");
+        opt.innerHTML =
+            data.results[i].name +
+            ", " +
+            data.results[i].admin1 +
+            ", " +
+            data.results[i].country;
+        citiesList.appendChild(opt);
+    }
+}
 
 var d = new Date();
 var n = d.getHours();
 
 function loadBackgroundImage(picData) {
     bgImg = picData.hits[0].largeImageURL;
-    var bgElements = document.getElementsByClassName('hero-image');
+    var bgElements = document.getElementsByClassName("hero-image");
     var author = picData.hits[0].user;
     bgElements[0].style.backgroundImage = "url(" + bgImg + ")";
     document.getElementById("author").innerHTML = author;
 }
 
-function weatherFunc(weatherData) {
-    var k = weatherData.main.temp;
-    k = parseFloat(k);
-    var f = kToF(k);
-    weatherItems = document.getElementsByClassName("weather2");
-    document.getElementById("location").innerHTML = weatherData.name;
-    document.getElementById("temperature").innerHTML = Math.round(f) + "&#176F";
-    document.getElementById("condition").innerHTML = weatherData.weather[0].main;
+// Shows just the weather, assumes we already retrieved it.
+// Has nothing to do with picking a city.
+function showWeather(data) {
+    //globalData = data;
+    console.log("showing the weather....");
+
+    // Display data in an HTML element
+    var jsonStr = JSON.stringify(data, null, 2);
+    //console.log(jsonStr);
+    var obj = JSON.parse(jsonStr);
+    console.log(obj);
+    //console.log(obj.length);
+    const temp = document.getElementById("temp");
+    temp.innerHTML = obj.current.temperature_2m + ' ' + obj.current_units.temperature_2m;
 }
 
-function kToF(k) {
-    return (k - 273.15) * 1.8 + 32;
+// When you are searching for a city and click the lookup button.
+function lookupCityBtnClick() {
+    console.log("inside the function");
+    city = document.getElementById("cityInput").value;
+
+    var weatherCall =
+        "https://geocoding-api.open-meteo.com/v1/search?name=" +
+        city +
+        "&count=10&language=en&format=json";
+    fetch(weatherCall)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log("things were okay, parsingData");
+            parseData(data);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+// Changes the city label and changes the actual weather too
+function changeCityBtnClick() {
+    var i = citiesList.selectedIndex;
+    city =
+        globalData.results[i].name +
+        ", " +
+        globalData.results[i].admin1 +
+        ", " +
+        globalData.results[i].country;
+    chosenCity.innerHTML = city;
+
+    var longitude = globalData.results[i].longitude;
+    var latitude = globalData.results[i].latitude;
+
+    var weatherString =
+        "https://api.open-meteo.com/v1/forecast?latitude=" +
+        latitude +
+        "&longitude=" +
+        longitude +
+        "&current=temperature_2m,precipitation,rain,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=ms&precipitation_unit=inch&forecast_days=1";
+
+    fetch(weatherString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log("things were okay, parsingData");
+            showWeather(data);
+            // parseData(data);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
 }
