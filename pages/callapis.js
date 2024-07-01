@@ -1,7 +1,22 @@
 var pixabayAPIKey = "5493635-8300921d011275a8906d2c6d3";
 var bgImg = "";
+
+
+var categories = ["roses", "mountains", "waterfalls", "landscapes", "autumn scenes"];
+
+var selectedCategory = categories[0];
 var apiCall =
-    "https://pixabay.com/api/?key=" + pixabayAPIKey + "&q=roses&image_type=photo";
+    "https://pixabay.com/api/?key=" + pixabayAPIKey + "&q=" + selectedCategory + "&image_type=photo";
+
+const bgCategoriesList = document.getElementById("bgCategoriesList");
+
+bgCategoriesList.innerHTML = "";
+// Fill out the list.
+for (var i = 0; i < categories.length; i++) {
+    const opt = document.createElement("option");
+    opt.innerHTML = categories[i];
+    bgCategoriesList.appendChild(opt);
+}
 
 // The $ is JQuery
 $.getJSON(apiCall, loadBackgroundImage);
@@ -20,21 +35,35 @@ var chosenCityLon;
 //console.log('supposedly after')
 showDefaultCityWeather(chosenCityName);
 
-
+// --------------------------------- Settings panel ----------------------------------------
+// This sets up the settings panel to hide/unhide on click.
 var coll = document.getElementsByClassName("collapsible");
-var i;
 
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
-    }
-  });
+for (var i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function () {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+            content.style.display = "none";
+        } else {
+            content.style.display = "block";
+        }
+    });
 }
+
+// Force settings panel to be hidden when loading page. It takes twice to make it hidden?
+settingsBtn.click();
+settingsBtn.click();
+// -------------------------------------------------------------------------------------------
+
+
+//coll[0].toggleAttribute("active");
+
+//var coll = document.getElementsByClassName("collapsible");
+
+//for (var i = 0; i < coll.length; i++) {
+
+
 //setWeather();
 
 /*const citiesList = document.getElementById("citiesList");
@@ -241,9 +270,9 @@ function parseData(data) {
         opt.innerHTML =
             data.results[i].name +
             ", " +
-            data.results[i].admin1 +
-            ", " +
-            data.results[i].country;
+            data.results[i].admin1 //+
+        //", " +
+        //data.results[i].country;
         citiesList.appendChild(opt);
     }
 }
@@ -252,9 +281,16 @@ var d = new Date();
 var n = d.getHours();
 
 function loadBackgroundImage(picData) {
-    bgImg = picData.hits[0].largeImageURL;
+    // Get a random picture index.
+    i = Math.floor(Math.random() * picData.hits.length);
+    // Debug info.
+    // console.log("-----------------------------------------------\n");
+    //console.log("number of pictures found count = " + picData.hits.length);
+    //console.log("-----------------------------------------------");
+    console.log(picData);
+    bgImg = picData.hits[i].largeImageURL;
     var bgElements = document.getElementsByClassName("hero-image");
-    var author = picData.hits[0].user;
+    var author = picData.hits[i].user;
     bgElements[0].style.backgroundImage = "url(" + bgImg + ")";
     document.getElementById("author").innerHTML = author;
 }
@@ -306,9 +342,9 @@ function changeCityBtnClick() {
     city =
         globalData.results[i].name +
         ", " +
-        globalData.results[i].admin1 +
-        ", " +
-        globalData.results[i].country;
+        globalData.results[i].admin1 //+
+    //", " +
+    //globalData.results[i].country;
     chosenCity.innerHTML = city;
 
     var longitude = globalData.results[i].longitude;
@@ -336,4 +372,15 @@ function changeCityBtnClick() {
         .catch((error) => {
             console.error("Error:", error);
         });
+}
+
+function changeBgCategoryBtnClick() {
+    selectedCategory = bgCategoriesList.value;
+    apiCall =
+        "https://pixabay.com/api/?key=" + pixabayAPIKey + "&q=" + selectedCategory + "&image_type=photo";
+    $.getJSON(apiCall, loadBackgroundImage);
+}
+
+function refreshBtnClick() {
+    $.getJSON(apiCall, loadBackgroundImage);
 }

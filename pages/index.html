@@ -17,40 +17,49 @@
 
 
       <div id="settings-panel">
-        <button id="settingsBtn" class="collapsible"><img src="path1.png"/></button>
+        <button id="settingsBtn" class="collapsible">
+          <img src="path1.png" />
+          <p class="collapsibleTitle">Settings</p>
+        </button>
         <!--The actual contents of the settings panel.-->
-          <div class="content">
-            <input type="text" id="cityInput">
-            <button id="lookupCityBtn" type="button" onclick="lookupCityBtnClick()">Search city</button>
-          
-            <select id="citiesList" class="myselect"></select>
-            <button id="changeCityBtn" onclick="changeCityBtnClick()">Change City</button>
-          </div>
-          
-        
+        <div>
+          <p class="header">Change location</p>
+          <input type="text" id="cityInput">
+          <button id="lookupCityBtn" type="button" onclick="lookupCityBtnClick()">Search city</button>
+
+          <select id="citiesList" class="myselect"></select>
+          <button id="changeCityBtn" onclick="changeCityBtnClick()">Change City</button>
+          <br />
+          <p class="header">Change background category</p>
+          <select id="bgCategoriesList" class="myselect"></select>
+          <button id="changeBgCategoryBtn" onclick="changeBgCategoryBtnClick()">Change Background Category</button>
+          <button id="refreshBtn" onclick="refreshBtnClick()">Refresh Background</button>
+        </div>
+
+
       </div>
       <div id="image-credits-panel">
         <p id="picInfo">Image taken by <span id="author"></span> from Pixabay.com. Thank you!
       </div>
-      
+
       <div id="weather-panel">
         <label class="normalSizeLabel" id="chosenCity"></label>
         <br>
-        
+
         <!--
         <div>
           <input type="text" id="cityInput">
           <button id="lookupCityBtn" type="button" onclick="lookupCityBtnClick()">Search city</button>
           <!--<p id="outputElement"></p>-->
-          <!--
+        <!--
           <select id="citiesList" class="myselect"></select>
           <button id="changeCityBtn" onclick="changeCityBtnClick()">Change City</button>
         </div>
         -->
-        
+
         <p id="temp"></p>
       </div>
-      
+
       <div id="image-credits-panel">
         <p id="picInfo">Image taken by <span id="author"></span> from Pixabay.com. Thank you!
       </div>
